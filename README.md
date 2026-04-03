@@ -1,202 +1,106 @@
-# Finance Data Processing and Access Control Backend
+# 💎 Nova Finance - Premium MERN Financial Dashboard
 
-A backend system for a **finance dashboard** that handles financial records, user roles, access control, and analytics. Built with Node.js, Express, TypeScript, Prisma ORM, and PostgreSQL.
+Nova Finance is a high-end, "Linear-inspired" financial management platform built with the MERN stack (MongoDB/PostgreSQL, Express, React/Next.js, Node.js). It offers a professional-grade dark mode interface, interactive analytics, and robust role-based access control.
 
 ---
 
-## Tech Stack
+## ✨ Features
+
+### 🎨 Premium UI/UX
+- **Linear-style Dark Mode**: A sleek, high-contrast interface with glassmorphism, subtle glows, and modern typography (Inter).
+- **Responsive Layout**: Optimized for both desktop and mobile viewing with a semi-transparent floating sidebar.
+- **Interactive Charts**: Real-time Cash Flow trends powered by Recharts with smooth area gradients.
+
+### 📊 Data & Analytics
+- **CSV Export**: Instantly download your transaction history, account summaries, or dashboard activity as spreadsheet-ready CSV files.
+- **Smart Stat Cards**: Visual health pulse checks with percentage trends and dynamic icon coloring.
+- **Atomic Transactions**: Balance updates are handled atomically using Prisma `$transaction` to ensure 100% data integrity.
+
+### 🔐 Security & Access Control
+- **Role-Based Access (RBAC)**: Secure access for `ADMIN`, `ANALYST`, and `VIEWER` roles. 
+- **Admin Secret**: Register as an admin immediately by providing a secure `ADMIN_SECRET` during signup.
+- **Auth Persistence**: Reliable session management that stays logged in across page refreshes.
+
+---
+
+## 🛠️ Tech Stack
 
 | Layer | Technology |
 | :--- | :--- |
-| Runtime | Node.js |
-| Framework | Express.js |
-| Language | TypeScript |
-| ORM | Prisma |
-| Database | PostgreSQL |
-| Auth | JWT (jsonwebtoken) + bcryptjs |
-| Validation | Zod |
-| Logging | Morgan |
+| **Frontend** | Next.js 14, TailwindCSS, Lucide Icons, Recharts |
+| **Backend** | Node.js, Express.js, TypeScript |
+| **Database** | PostgreSQL (Neon.tech), Prisma ORM |
+| **Auth** | JWT, bcryptjs |
+| **Validation** | Zod |
 
 ---
 
-## Getting Started
+## 🚀 Getting Started
 
-### Prerequisites
+### 1. Prerequisites
 - Node.js v18+
-- PostgreSQL database (local or cloud)
+- A Neon.tech (or PostgreSQL) account
 
-### Setup
+### 2. Environment Setup
+Create a `.env` file in the **root** and a `.env.local` in the **frontend** directory.
 
-1. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-2. **Configure environment variables** — create a `.env` file in the root:
-   ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/finance_db?schema=public"
-   JWT_SECRET="your_secure_jwt_secret"
-   JWT_EXPIRES_IN="7d"
-   PORT=5000
-   ```
-
-3. **Push the database schema**
-   ```bash
-   npx prisma db push
-   ```
-
-4. **Start the development server**
-   ```bash
-   npm run dev
-   ```
-
-The server will start at `http://localhost:5000`.
-
-> **Note:** The first registered user defaults to the `VIEWER` role. 
-> To properly test the application with **Admin** privileges, it is recommended to register as `admin@finance.com` and then elevate your permissions safely using Prisma:
-> ```bash
-> npx prisma studio
-> ```
-> *(Navigate to the User table and change your Role from VIEWER to ADMIN)*
----
-
-## Role-Based Access Control (RBAC)
-
-The system enforces three roles. Every protected route checks the JWT token and role before granting access.
-
-| Role | Capabilities |
-| :--- | :--- |
-| **ADMIN** | Full access — manage users, accounts, categories, and transactions |
-| **ANALYST** | Read-only access to records, accounts, categories, and all dashboard data |
-| **VIEWER** | Dashboard summary access only — cannot view raw financial records |
-
-### User Status
-| Status | Effect |
-| :--- | :--- |
-| **ACTIVE** | Normal access based on assigned role |
-| **INACTIVE** | Login blocked — token generation refused at auth layer |
-
----
-
-## API Reference
-
-> All endpoints are prefixed with `/api/v1/`
-
-### Authentication
-No token required.
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `POST` | `/api/v1/auth/register` | Register a new user (defaults to VIEWER role) |
-| `POST` | `/api/v1/auth/login` | Login and receive a JWT token |
-
----
-
-### Dashboard
-🔒 Requires token — accessible by **all roles**.
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/dashboard/summary` | Total income, total expenses, net balance |
-| `GET` | `/api/v1/dashboard/categories` | Spending/income totals grouped by category |
-| `GET` | `/api/v1/dashboard/recent` | Last 5 transactions with account details |
-| `GET` | `/api/v1/dashboard/trends` | Daily income & expense trends for the last 30 days |
-
----
-
-### Transactions
-🔒 Requires token — **ADMIN** and **ANALYST** only.
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/transactions` | ADMIN, ANALYST | List all transactions (supports filtering) |
-| `POST` | `/api/v1/transactions` | ADMIN | Create a new transaction |
-| `DELETE` | `/api/v1/transactions/:id` | ADMIN | Delete a transaction and revert account balance |
-
-**Filtering query parameters for `GET /api/v1/transactions`:**
-| Param | Values | Description |
-| :--- | :--- | :--- |
-| `type` | `INCOME` / `EXPENSE` | Filter by transaction type |
-| `categoryId` | UUID string | Filter by a specific category |
-| `startDate` | ISO date string | Start of date range |
-| `endDate` | ISO date string | End of date range |
-
----
-
-### Accounts
-🔒 Requires token — **ADMIN** and **ANALYST** only.
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/accounts` | ADMIN, ANALYST | List all accounts for the logged-in user |
-| `POST` | `/api/v1/accounts` | ADMIN | Create a new account |
-| `DELETE` | `/api/v1/accounts/:id` | ADMIN | Delete an account |
-
----
-
-### Categories
-🔒 Requires token — **ADMIN** and **ANALYST** only.
-
-| Method | Endpoint | Access | Description |
-| :--- | :--- | :--- | :--- |
-| `GET` | `/api/v1/categories` | ADMIN, ANALYST | List all categories for the logged-in user |
-| `POST` | `/api/v1/categories` | ADMIN | Create a new category |
-| `DELETE` | `/api/v1/categories/:id` | ADMIN | Delete a category |
-
----
-
-### User Management
-🔒 Requires token — **ADMIN** only.
-
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/api/v1/users` | List all users in the system |
-| `GET` | `/api/v1/users/:id` | Get a single user by ID |
-| `POST` | `/api/v1/users` | Create a user (admin-initiated, sets default password) |
-| `PATCH` | `/api/v1/users/:id` | Update role (`ADMIN`/`ANALYST`/`VIEWER`) or status (`ACTIVE`/`INACTIVE`) |
-| `DELETE` | `/api/v1/users/:id` | Delete a user |
-
----
-
-## Project Structure
-
+**Root (.env):**
+```env
+DATABASE_URL="postgresql://user:pass@host:port/neondb?sslmode=require"
+DIRECT_URL="postgresql://user:pass@host:port/neondb?sslmode=require"
+JWT_SECRET="your_secret"
+JWT_EXPIRES_IN="7d"
+PORT=5000
+ADMIN_SECRET="admin123"
 ```
-src/
-├── common/
-│   ├── constants/         # Role enums and error message strings
-│   ├── decorators/        # catchAsync — removes try-catch from controllers
-│   ├── filters/           # Global HTTP exception handler
-│   ├── guards/            # JWT auth guard + role-based authorize
-│   ├── interceptors/      # Response interceptor (standardizes response shape)
-│   ├── pipes/             # Zod validation pipe
-│   └── utils/             # JWT, bcrypt, and Prisma client utilities
-│
-├── config/
-│   └── env.config.ts      # Typed environment variable access
-│
-├── modules/
-│   ├── auth/              # Register & login
-│   ├── accounts/          # Bank / cash accounts
-│   ├── categories/        # Income & expense categories
-│   ├── transactions/      # Financial records with atomic balance updates
-│   ├── dashboard/         # Summary, trends, and analytics
-│   └── users/             # User and role management
-│
-└── main.ts                # Application bootstrap
+
+**Frontend (frontend/.env.local):**
+```env
+NEXT_PUBLIC_API_URL="https://your-api-url.com/api/v1"
+```
+
+### 3. Installation & Seeding
+```bash
+# Install root dependencies
+npm install
+
+# Install frontend dependencies
+cd frontend && npm install && cd ..
+
+# Generate Prisma Client & Push Schema
+npx prisma generate
+npx prisma db push
+
+# Seed with Premium Dummy Data (Creates Admin Account)
+npx prisma db seed
+```
+
+### 4. Running Locally
+```bash
+# Start Backend
+npm run dev
+
+# Start Frontend (in a new terminal)
+cd frontend
+npm run dev
 ```
 
 ---
 
-## Architecture Notes
+## 🔑 Default Accounts (Post-Seed)
+After running the seed command, you can log in with:
+- **Admin:** `admin@example.com` / `password: admin123`
+- **Role:** Full Administrative Access
 
-- **Layered design**: Routes → Controllers → Services → Prisma (no business logic leaks into routes or controllers)
-- **catchAsync decorator**: All async controller methods are wrapped — no manual try-catch blocks
-- **Response interceptor**: All successful responses follow a standard shape `{ success: true, data, timestamp }`
-- **Global error filter**: All errors return `{ success: false, error: { message, status, path, timestamp } }`
-- **Atomic balance updates**: Creating or deleting a transaction updates the linked account balance in a single Prisma `$transaction` to prevent data inconsistency
+---
 
-## Tradeoffs & Assumptions
+## 📂 Architecture
+Nova Finance follows a clean, module-based architecture:
+- **`/common`**: Shared constants, guards, pipes, and interceptors.
+- **`/modules`**: Feature-specific logic (Auth, Accounts, Transactions, Categories).
+- **`/frontend`**: Modern Next.js App Router directory structure.
 
-- **Summary aggregation**: Dashboard totals are computed in-memory. For large datasets a production system would use SQL `GROUP BY` aggregations or database views.
-- **JWT only**: Tokens are stateless with no refresh mechanism. A production system would add refresh tokens and a revocation list.
-- **First Admin**: The first registered user must be manually promoted to `ADMIN` via the database since the self-registration endpoint defaults to `VIEWER`.
+---
+
+## 📄 License
+Distributed under the MIT License.
