@@ -2,16 +2,13 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { ArrowUpRight, ArrowDownRight, Activity, DollarSign, CreditCard } from "lucide-react";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
 
-// Mock data for the chart to make it look alive initially while we wait for backend trend APIs if needed.
-// (Backend returns recent transactions, we map them optionally or use placeholder trends for visual wow factor).
+// Mock data strictly to visualize the neo-brutalist chart
 const generateMockTrends = () => {
-    return Array.from({ length: 7 }).map((_, i) => ({
-        name: `Day ${i + 1}`,
-        income: Math.floor(Math.random() * 500) + 1000,
-        expense: Math.floor(Math.random() * 300) + 500,
+    return Array.from({ length: 15 }).map((_, i) => ({
+        name: `D${i + 1}`,
+        value: Math.floor(Math.random() * 5000) + 1000,
     }));
 };
 
@@ -36,116 +33,86 @@ export default function DashboardOverview() {
 
     if (loading) {
         return (
-            <div className="flex h-full items-center justify-center">
-                <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+            <div className="flex h-full items-center justify-center font-mono text-xs text-gray-500 uppercase tracking-widest">
+                [ INITIALIZING SYSTEM ]
             </div>
         );
     }
 
-    const StatCard = ({ title, value, icon: Icon, trend, type }: any) => (
-        <div className="glass-card p-6 relative overflow-hidden group hover:border-primary/50 transition-colors">
-            <div className="absolute -right-6 -top-6 w-24 h-24 bg-gradient-to-br from-white/5 to-transparent rounded-full blur-2xl group-hover:bg-primary/10 transition-colors" />
-            <div className="flex justify-between items-start mb-4 relative z-10">
-                <p className="text-muted-foreground font-medium text-sm">{title}</p>
-                <div className={`p-2 rounded-lg ${type === 'income' ? 'bg-emerald-500/10 text-emerald-500' : type === 'expense' ? 'bg-destructive/10 text-destructive' : 'bg-primary/10 text-primary'}`}>
-                    <Icon className="w-5 h-5" />
-                </div>
-            </div>
-            <h3 className="text-3xl font-bold tracking-tight mb-2 relative z-10">${value?.toLocaleString() || '0.00'}</h3>
-            <div className="flex items-center gap-1 text-sm font-medium relative z-10">
-                {trend > 0 ? (
-                    <span className="flex items-center text-emerald-500"><ArrowUpRight className="w-4 h-4 mr-1"/> +{trend}%</span>
-                ) : (
-                    <span className="flex items-center text-destructive"><ArrowDownRight className="w-4 h-4 mr-1"/> {trend}%</span>
-                )}
-                <span className="text-muted-foreground ml-2">from last month</span>
-            </div>
+    const StatBlock = ({ title, value, type }: any) => (
+        <div className="p-6 border border-[#1f2937] hover:border-gray-500 transition-colors bg-[#050505]">
+            <p className="text-gray-500 uppercase tracking-widest text-xs mb-4">{title}</p>
+            <h3 className={`text-4xl lg:text-5xl font-bold tracking-tighter ${type === 'net' ? 'text-white' : type === 'income' ? 'text-[#a3e635]' : 'text-[#f43f5e]'}`}>
+                ${value?.toLocaleString() || '0.00'}
+            </h3>
         </div>
     );
 
     return (
-        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight mb-1">Financial Overview</h1>
-                <p className="text-muted-foreground">Monitor your financial pulse in real-time.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <StatCard 
-                    title="Total Balance" 
-                    value={summary?.netBalance} 
-                    icon={DollarSign} 
-                    trend={+12.5} 
-                    type="net" 
-                />
-                <StatCard 
-                    title="Total Income" 
-                    value={summary?.totalIncome} 
-                    icon={Activity} 
-                    trend={+8.2} 
-                    type="income" 
-                />
-                <StatCard 
-                    title="Total Expenses" 
-                    value={summary?.totalExpenses} 
-                    icon={CreditCard} 
-                    trend={-2.4} 
-                    type="expense" 
-                />
+        <div className="space-y-6 animate-in fade-in duration-700">
+            {/* Top Stat Row */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#1f2937] bg-black">
+                <div className="md:border-r border-[#1f2937]">
+                    <StatBlock title="Net Liquidity" value={summary?.netBalance} type="net" />
+                </div>
+                <div className="md:border-r border-[#1f2937]">
+                    <StatBlock title="Total Volume (IN)" value={summary?.totalIncome} type="income" />
+                </div>
+                <div>
+                    <StatBlock title="Total Volume (OUT)" value={summary?.totalExpenses} type="expense" />
+                </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 glass-card p-6 flex flex-col">
-                    <h3 className="text-lg font-semibold mb-6">Cash Flow Analytics</h3>
-                    <div className="flex-1 min-h-[300px] w-full">
+                {/* Full Bleed Graph Area */}
+                <div className="lg:col-span-2 border border-[#1f2937] bg-[#050505] flex flex-col relative overflow-hidden">
+                     <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-[#a3e635] animate-pulse" />
+                        <span className="text-xs text-gray-400 font-mono uppercase tracking-widest">Live Flow</span>
+                    </div>
+                    <div className="flex-1 w-full h-[400px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                            <AreaChart data={trends}>
                                 <defs>
-                                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
-                                    </linearGradient>
-                                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="5%" stopColor="#ef4444" stopOpacity={0.3}/>
-                                    <stop offset="95%" stopColor="#ef4444" stopOpacity={0}/>
+                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#a3e635" stopOpacity={0.15}/>
+                                    <stop offset="100%" stopColor="#a3e635" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" vertical={false} />
-                                <XAxis dataKey="name" stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} tickLine={false} axisLine={false} />
-                                <YAxis stroke="rgba(255,255,255,0.5)" tick={{fill: 'rgba(255,255,255,0.5)', fontSize: 12}} tickLine={false} axisLine={false} tickFormatter={(val) => `$${val}`} />
+                                <XAxis dataKey="name" hide />
                                 <Tooltip 
-                                    contentStyle={{ backgroundColor: 'rgba(15, 23, 42, 0.9)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                                    itemStyle={{ color: '#fff' }}
+                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #1f2937', borderRadius: '0', color: '#fff', fontSize: '12px' }}
+                                    itemStyle={{ color: '#a3e635' }}
                                 />
-                                <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
-                                <Area type="monotone" dataKey="expense" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorExpense)" />
+                                <Area type="step" dataKey="value" stroke="#a3e635" strokeWidth={1} fillOpacity={1} fill="url(#colorValue)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                <div className="glass-card p-0 flex flex-col overflow-hidden">
-                    <div className="p-6 border-b border-border">
-                        <h3 className="text-lg font-semibold">Recent Transactions</h3>
+                {/* Dense Transaction Registry */}
+                <div className="border border-[#1f2937] bg-[#050505] flex flex-col h-[400px] overflow-hidden">
+                    <div className="p-4 border-b border-[#1f2937] bg-[#0a0a0a]">
+                        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-bold">Transaction Registry</h3>
                     </div>
-                    <div className="flex-1 overflow-y-auto max-h-[350px]">
+                    <div className="flex-1 overflow-y-auto">
                         {summary?.recentTransactions?.length ? (
-                            <div className="divide-y divide-border">
+                            <div className="divide-y divide-[#1f2937]">
                                 {summary.recentTransactions.map((tx: any) => (
-                                    <div key={tx.id} className="p-4 hover:bg-white/5 transition-colors flex justify-between items-center">
-                                        <div>
-                                            <p className="font-medium text-sm text-foreground">{tx.description || 'Unknown Transaction'}</p>
-                                            <p className="text-xs text-muted-foreground mt-0.5">{new Date(tx.date).toLocaleDateString()}</p>
+                                    <div key={tx.id} className="p-4 hover:bg-[#0a0a0a] transition-colors flex justify-between items-center text-sm">
+                                        <div className="font-mono">
+                                            <p className="text-white mb-1">{tx.description || 'N/A'}</p>
+                                            <p className="text-[10px] text-gray-500">{new Date(tx.date).toLocaleDateString()}</p>
                                         </div>
-                                        <div className={`font-semibold ${tx.category?.type === 'INCOME' ? 'text-emerald-500' : 'text-foreground'}`}>
+                                        <div className={`font-mono text-right ${tx.category?.type === 'INCOME' ? 'text-[#a3e635]' : 'text-gray-400'}`}>
                                             {tx.category?.type === 'INCOME' ? '+' : '-'}${tx.amount.toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center p-6 text-center text-muted-foreground text-sm">
-                                No recent transactions.<br />Time to make some moves!
+                            <div className="h-full flex items-center justify-center text-xs text-gray-600 uppercase tracking-widest font-mono p-4 text-center">
+                                No records located
                             </div>
                         )}
                     </div>

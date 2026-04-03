@@ -3,25 +3,26 @@
 @tailwind utilities;
 
 :root {
-  --background: #0f172a;
-  --foreground: #f8fafc;
-  --card: rgba(30, 41, 59, 0.4);
-  --card-foreground: #f8fafc;
-  --border: rgba(255, 255, 255, 0.1);
+  --background: #000000;
+  --foreground: #f3f4f6;
+  --card: #000000;
+  --card-foreground: #f3f4f6;
+  --border: #1f2937;
+  --accent-lime: #a3e635; /* Terminal green */
+  --accent-rose: #f43f5e; /* Terminal red */
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  background-image: 
-    radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(16, 185, 129, 0.15), transparent 25%);
-  background-attachment: fixed;
   min-height: 100vh;
+  font-feature-settings: "tnum" 1, "cv05" 1, "cv08" 1; /* Crisp tabular digits */
 }
 
 @layer utilities {
-  .glass-card {
-    @apply bg-card backdrop-blur-md border border-border shadow-glass rounded-xl;
+  .terminal-panel {
+    background-color: var(--card);
+    border: 1px solid var(--border);
   }
 }
+

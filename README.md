@@ -52,8 +52,12 @@ A backend system for a **finance dashboard** that handles financial records, use
 
 The server will start at `http://localhost:5000`.
 
-> **Note:** The first registered user defaults to the `VIEWER` role. To create an Admin, manually update the role in the database via Prisma Studio (`npx prisma studio`) or a DB client.
-
+> **Note:** The first registered user defaults to the `VIEWER` role. 
+> To properly test the application with **Admin** privileges, it is recommended to register as `admin@finance.com` and then elevate your permissions safely using Prisma:
+> ```bash
+> npx prisma studio
+> ```
+> *(Navigate to the User table and change your Role from VIEWER to ADMIN)*
 ---
 
 ## Role-Based Access Control (RBAC)
