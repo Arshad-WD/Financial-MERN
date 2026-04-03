@@ -70,16 +70,15 @@ export default function DashboardOverview() {
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
-            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">
+            <div className="bg-[#111] border border-[#222] rounded-2xl p-8 text-[#ededed] shadow-[0_0_30px_rgba(59,130,246,0.1)] relative overflow-hidden">
                 {/* Decorative background geometry */}
-                <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
-                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl"></div>
+                <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-blue-500 opacity-[0.03] rounded-full blur-3xl"></div>
                 
                 <div className="relative z-10">
                     <h1 className="text-3xl font-bold tracking-tight mb-2">
                         Good morning — your finances are looking solid!
                     </h1>
-                    <p className="text-blue-100 max-w-xl">
+                    <p className="text-gray-400 max-w-xl">
                         You have received ${summary?.totalIncome?.toLocaleString() || '0'} in income over the trackable period. Check your detailed cash flow below.
                     </p>
                 </div>
@@ -95,7 +94,7 @@ export default function DashboardOverview() {
                 {/* Main Graph Area */}
                 <div className="lg:col-span-2 clean-card p-6 flex flex-col">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-base font-semibold text-slate-800">Cash Flow</h3>
+                        <h3 className="text-base font-semibold text-[#ededed]">Cash Flow</h3>
                     </div>
                     <div className="flex-1 w-full h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
@@ -110,11 +109,11 @@ export default function DashboardOverview() {
                                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
-                                <XAxis dataKey="name" stroke="#94a3b8" tick={{fill: '#94a3b8', fontSize: 12}} axisLine={false} tickLine={false} />
-                                <YAxis stroke="#94a3b8" tick={{fill: '#94a3b8', fontSize: 12}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val}`} />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#222" />
+                                <XAxis dataKey="name" stroke="#666" tick={{fill: '#666', fontSize: 12}} axisLine={false} tickLine={false} />
+                                <YAxis stroke="#666" tick={{fill: '#666', fontSize: 12}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val}`} />
                                 <Tooltip 
-                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
+                                    contentStyle={{ backgroundColor: '#111', border: '1px solid #333', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.5)', color: '#ededed' }}
                                 />
                                 <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
                                 <Area type="monotone" dataKey="expense" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorExpense)" />
@@ -125,26 +124,26 @@ export default function DashboardOverview() {
 
                 {/* Recent Transactions List */}
                 <div className="clean-card flex flex-col overflow-hidden max-h-[440px]">
-                    <div className="p-5 border-b border-border bg-slate-50/50">
-                        <h3 className="text-base font-semibold text-slate-800">Recent Activity</h3>
+                    <div className="p-5 border-b border-[#222]">
+                        <h3 className="text-base font-semibold text-[#ededed]">Recent Activity</h3>
                     </div>
                     <div className="flex-1 overflow-y-auto">
                         {summary?.recentTransactions?.length ? (
-                            <div className="divide-y divide-border">
+                            <div className="divide-y divide-[#222]">
                                 {summary.recentTransactions.map((tx: any) => (
-                                    <div key={tx.id} className="p-4 hover:bg-slate-50 transition-colors flex justify-between items-center text-sm">
+                                    <div key={tx.id} className="p-4 hover:bg-[#111] transition-colors flex justify-between items-center text-sm">
                                         <div>
-                                            <p className="font-semibold text-slate-700">{tx.description || 'Unknown'}</p>
-                                            <p className="text-xs text-slate-500 mt-0.5">{new Date(tx.date).toLocaleDateString()}</p>
+                                            <p className="font-semibold text-[#ededed]">{tx.description || 'Unknown'}</p>
+                                            <p className="text-xs text-gray-500 mt-0.5">{new Date(tx.date).toLocaleDateString()}</p>
                                         </div>
-                                        <div className={`font-bold ${tx.category?.type === 'INCOME' ? 'text-emerald-600' : 'text-slate-700'}`}>
+                                        <div className={`font-bold ${tx.category?.type === 'INCOME' ? 'text-emerald-500' : 'text-gray-400'}`}>
                                             {tx.category?.type === 'INCOME' ? '+' : '-'}${tx.amount.toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center text-slate-500 text-sm p-6 text-center">
+                            <div className="h-full flex items-center justify-center text-gray-500 text-sm p-6 text-center">
                                 No recent activity found.
                             </div>
                         )}

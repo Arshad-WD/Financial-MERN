@@ -31,12 +31,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div className="min-h-screen bg-background flex text-foreground font-sans">
             {/* Soft Minimalist Sidebar */}
-            <aside className="w-64 border-r border-border bg-white hidden md:flex flex-col">
+            <aside className="w-64 border-r border-[#222222] bg-[#000000]/50 backdrop-blur-md hidden md:flex flex-col">
                 <div className="p-6 flex items-center gap-3">
                     <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
                         <span className="text-white font-bold tracking-tight">F</span>
                     </div>
-                    <span className="font-bold tracking-tight text-lg text-slate-800">Finance</span>
+                    <span className="font-bold tracking-tight text-lg text-[#ededed]">Finance</span>
                 </div>
 
                 <div className="px-6 pb-4">
@@ -63,19 +63,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </nav>
                 </div>
 
-                <div className="mt-auto p-4 border-t border-border">
-                    <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-slate-50 border border-border">
-                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs uppercase shadow-sm">
+                <div className="mt-auto p-4 border-t border-[#222222]">
+                    <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-[#0a0a0a] border border-[#222222]">
+                        <div className="w-8 h-8 rounded-full bg-blue-900/50 flex items-center justify-center text-blue-400 font-bold text-xs uppercase shadow-sm">
                             {user?.name?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-semibold text-slate-700 truncate">{user?.name}</p>
-                            <p className="text-xs text-slate-500 truncate">{user?.role}</p>
+                            <p className="text-sm font-semibold text-[#ededed] truncate">{user?.name}</p>
+                            <p className="text-xs text-gray-500 truncate">{user?.role}</p>
                         </div>
                     </div>
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-sm text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors"
                     >
                         <LogOut className="w-4 h-4" />
                         Log out
