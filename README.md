@@ -89,7 +89,7 @@ npm run dev
 
 ## 🔑 Default Accounts (Post-Seed)
 After running the seed command, you can log in with:
-- **Admin:** `admin@example.com` / `password: admin123`
+- **Admin:** `admin@finance.com` / `password: admin123`
 - **Role:** Full Administrative Access
 
 ---
