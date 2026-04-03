@@ -11,9 +11,14 @@ export const validationPipe = (schema: ZodSchema) => {
         const result = schema.safeParse(req.body);
 
         if (!result.success) {
+            const firstErrorMessage = result.error.issues[0]?.message || ErrorMessages.VALIDATION_FAILED;
             return res.status(400).json({
-                message: ErrorMessages.VALIDATION_FAILED,
-                errors: result.error.issues,
+                success: false,
+                error: {
+                    message: firstErrorMessage,
+                    details: result.error.issues,
+                    status: 400
+                }
             });
         }
         req.body = result.data; // <- cleaned data

@@ -8,8 +8,8 @@ import { Role } from "../../common/constants/roles.enum.js";
 const router = Router();
 const controller = new CategoryController();
 
-router.get("/", protect, authorize(Role.ADMIN, Role.ANALYST), controller.findAll);
-router.post("/", protect, authorize(Role.ADMIN), validationPipe(createCategorySchema), controller.create);
-router.delete("/:id", protect, authorize(Role.ADMIN), controller.delete);
+router.get("/", protect, authorize(Role.ADMIN, Role.ANALYST, Role.VIEWER), controller.findAll);
+router.post("/", protect, authorize(Role.ADMIN, Role.VIEWER), validationPipe(createCategorySchema), controller.create);
+router.delete("/:id", protect, authorize(Role.ADMIN, Role.VIEWER), controller.delete);
 
 export default router;

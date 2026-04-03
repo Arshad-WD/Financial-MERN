@@ -12,8 +12,8 @@ const controller = new TransactionController();
 // Analyst: Read-only access to records
 // Admin: Full management (create, read, delete)
 // Viewer: Restricted to dashboard only
-router.get("/", protect, authorize(Role.ADMIN, Role.ANALYST), controller.findAll);
-router.post("/", protect, authorize(Role.ADMIN), validationPipe(createTransactionSchema), controller.create);
-router.delete("/:id", protect, authorize(Role.ADMIN), controller.delete);
+router.get("/", protect, authorize(Role.ADMIN, Role.ANALYST, Role.VIEWER), controller.findAll);
+router.post("/", protect, authorize(Role.ADMIN, Role.VIEWER), validationPipe(createTransactionSchema), controller.create);
+router.delete("/:id", protect, authorize(Role.ADMIN, Role.VIEWER), controller.delete);
 
 export default router;

@@ -8,19 +8,19 @@ import { LayoutDashboard, Receipt, Wallet, LogOut } from "lucide-react";
 import clsx from "clsx";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const { isAuthenticated, logout, user } = useAuth();
+    const { isAuthenticated, logout, user, isLoading } = useAuth();
     const router = useRouter();
     const pathname = usePathname();
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
         setMounted(true);
-        if (!isAuthenticated) {
+        if (!isLoading && !isAuthenticated) {
             router.push("/login");
         }
-    }, [isAuthenticated, router]);
+    }, [isAuthenticated, isLoading, router]);
 
-    if (!mounted || !isAuthenticated) return null;
+    if (!mounted || isLoading || !isAuthenticated) return null;
 
     const navigation = [
         { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
@@ -29,18 +29,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     ];
 
     return (
-        <div className="min-h-screen bg-background flex text-foreground font-sans">
-            {/* Soft Minimalist Sidebar */}
-            <aside className="w-64 border-r border-[#222222] bg-[#000000]/50 backdrop-blur-md hidden md:flex flex-col">
+        <div className="min-h-screen bg-black flex text-foreground font-sans">
+            {/* Premium Dark Sidebar */}
+            <aside className="w-64 border-r border-[#1a1a1a] bg-[#050505]/80 backdrop-blur-xl hidden md:flex flex-col">
                 <div className="p-6 flex items-center gap-3">
-                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
-                        <span className="text-white font-bold tracking-tight">F</span>
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                        <span className="text-white font-black tracking-tighter text-xl">F</span>
                     </div>
-                    <span className="font-bold tracking-tight text-lg text-[#ededed]">Finance</span>
+                    <div>
+                        <span className="font-black tracking-tighter text-xl text-[#ededed]">FINANCE</span>
+                        <div className="h-0.5 w-6 bg-blue-500 rounded-full mt-0.5"></div>
+                    </div>
                 </div>
 
-                <div className="px-6 pb-4">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Menu</p>
+                <div className="px-4 py-6 flex-1 overflow-y-auto">
+                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.2em] mb-4 px-4">Management</p>
                     <nav className="space-y-1">
                         {navigation.map((item) => {
                             const isActive = pathname === item.href;
@@ -49,13 +52,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                                     key={item.name}
                                     href={item.href}
                                     className={clsx(
-                                        "flex items-center gap-3 px-3 py-2 rounded-md font-medium text-sm transition-all duration-200",
+                                        "flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm transition-all duration-300 group relative",
                                         isActive 
-                                            ? "bg-slate-50 text-blue-600 shadow-sm border border-slate-100" 
-                                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                                            ? "text-blue-400 bg-blue-500/5 border border-blue-500/20 shadow-[0_0_15px_rgba(59,130,246,0.05)]" 
+                                            : "text-gray-500 hover:text-gray-300 hover:bg-white/[0.03]"
                                     )}
                                 >
-                                    <item.icon className="w-4 h-4" />
+                                    {isActive && <div className="absolute left-0 w-1 h-4 bg-blue-500 rounded-r-full shadow-[0_0_8px_rgba(59,130,246,0.5)]"></div>}
+                                    <item.icon className={clsx("w-4 h-4 transition-transform group-hover:scale-110", isActive && "text-blue-400")} />
                                     {item.name}
                                 </Link>
                             );
@@ -63,22 +67,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     </nav>
                 </div>
 
-                <div className="mt-auto p-4 border-t border-[#222222]">
-                    <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-[#0a0a0a] border border-[#222222]">
-                        <div className="w-8 h-8 rounded-full bg-blue-900/50 flex items-center justify-center text-blue-400 font-bold text-xs uppercase shadow-sm">
+                <div className="p-4 border-t border-[#1a1a1a] space-y-4">
+                    <div className="flex items-center gap-3 px-4 py-4 rounded-2xl bg-[#0a0a0a] border border-[#1a1a1a] group hover:border-[#333] transition-colors">
+                        <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-900/50 to-indigo-900/50 border border-blue-500/20 flex items-center justify-center text-blue-300 font-black text-sm uppercase">
                             {user?.name?.charAt(0) || 'U'}
                         </div>
                         <div className="flex-1 overflow-hidden">
-                            <p className="text-sm font-semibold text-[#ededed] truncate">{user?.name}</p>
-                            <p className="text-xs text-gray-500 truncate">{user?.role}</p>
+                            <p className="text-sm font-black text-[#ededed] truncate tracking-tight">{user?.name}</p>
+                            <div className="flex items-center gap-1.5">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_5px_rgba(16,185,129,0.5)]"></span>
+                                <p className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">
+                                    {user?.role === 'ADMIN' ? 'Administrator' : 'Financial Viewer'}
+                                </p>
+                            </div>
                         </div>
                     </div>
+                    
                     <button
                         onClick={logout}
-                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-sm text-gray-500 hover:text-red-400 hover:bg-red-900/20 transition-colors"
+                        className="w-full flex items-center gap-3 px-4 py-3 rounded-xl font-bold text-sm text-gray-500 hover:text-red-400 hover:bg-red-400/5 border border-transparent hover:border-red-400/10 transition-all group"
                     >
-                        <LogOut className="w-4 h-4" />
-                        Log out
+                        <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-1" />
+                        Sign Out
                     </button>
                 </div>
             </aside>

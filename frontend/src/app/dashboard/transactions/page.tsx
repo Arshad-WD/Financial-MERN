@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { Plus, Search, Filter } from "lucide-react";
+import { Plus, Search, Filter, ArrowUpRight, ArrowDownLeft, Calendar, Tag, CreditCard, SearchX } from "lucide-react";
+import clsx from "clsx";
 
 export default function TransactionsPage() {
     const [transactions, setTransactions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
 
     useEffect(() => {
         const fetchTxs = async () => {
@@ -24,73 +26,130 @@ export default function TransactionsPage() {
         fetchTxs();
     }, []);
 
+    const filteredTxs = transactions.filter(tx => 
+        tx.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        tx.category?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold tracking-tight text-[#ededed]">Transactions</h1>
-                    <p className="text-sm text-gray-500 mt-1">Manage and review your complete financial history.</p>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            {/* Header Section */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#0a0a0a] p-8 rounded-3xl border border-[#1a1a1a]">
+                <div className="space-y-1">
+                    <h1 className="text-3xl font-black tracking-tighter text-[#ededed]">TRANSACTIONS</h1>
+                    <p className="text-sm text-gray-500 font-medium max-w-sm">
+                        A complete ledger of your financial history across all connected accounts.
+                    </p>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 text-sm font-semibold rounded-lg flex items-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-colors">
-                    <Plus className="w-4 h-4" />
-                    New Transaction
+                <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.15)] active:scale-95 group">
+                    <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+                    Record Transaction
                 </button>
             </div>
 
-            <div className="clean-card overflow-hidden">
-                <div className="p-4 border-b border-[#222] bg-[#0a0a0a]/50 flex gap-4 items-center">
-                    <div className="relative flex-1 max-w-sm">
-                        <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
-                        <input 
-                            className="w-full bg-[#111] border border-[#333] text-[#ededed] rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all shadow-sm" 
-                            placeholder="Search transactions..."
-                        />
-                    </div>
-                    <button className="flex items-center gap-2 text-sm font-semibold text-gray-400 bg-[#111] border border-[#333] px-4 py-2 rounded-lg hover:bg-[#222] transition-colors">
-                        <Filter className="w-4 h-4" /> Filters
-                    </button>
+            {/* Filter Bar */}
+            <div className="flex flex-col sm:flex-row gap-4 items-center">
+                <div className="relative flex-1 group">
+                    <Search className="absolute left-4 top-3.5 h-4 w-4 text-gray-500 group-focus-within:text-blue-500 transition-colors" />
+                    <input 
+                        type="text"
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-[#0a0a0a] border border-[#1a1a1a] text-[#ededed] rounded-2xl pl-12 pr-4 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500/50 transition-all placeholder:text-gray-600" 
+                        placeholder="Search by description or category..."
+                    />
                 </div>
-                
+                <button className="flex items-center gap-2 text-sm font-bold text-gray-400 bg-[#0a0a0a] border border-[#1a1a1a] px-6 py-3.5 rounded-2xl hover:bg-[#111] hover:text-gray-200 transition-all h-full">
+                    <Filter className="w-4 h-4" /> 
+                    Filters
+                </button>
+            </div>
+
+            {/* Table Container */}
+            <div className="clean-card overflow-hidden bg-[#050505] border-[#1a1a1a] rounded-3xl">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-sm text-left">
-                        <thead className="bg-[#111] text-gray-400 border-b border-[#222] text-xs uppercase tracking-wider font-semibold">
+                    <table className="w-full text-left">
+                        <thead className="bg-[#0a0a0a] text-[10px] uppercase font-black tracking-[0.15em] text-gray-500 border-b border-[#1a1a1a]">
                             <tr>
-                                <th className="px-6 py-4">Date</th>
-                                <th className="px-6 py-4">Description</th>
-                                <th className="px-6 py-4">Category</th>
-                                <th className="px-6 py-4">Account</th>
-                                <th className="px-6 py-4 text-right">Amount</th>
+                                <th className="px-8 py-5">Activity</th>
+                                <th className="px-8 py-5">Category</th>
+                                <th className="px-8 py-5">Origin</th>
+                                <th className="px-8 py-5 text-right">Volume</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-[#222]">
+                        <tbody className="divide-y divide-[#131313]">
                             {loading ? (
-                                <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                        <div className="flex justify-center">
-                                            <div className="w-6 h-6 rounded-full border-2 border-[#333] border-t-blue-500 animate-spin" />
-                                        </div>
-                                    </td>
-                                </tr>
-                            ) : transactions.length > 0 ? (
-                                transactions.map((tx) => (
-                                    <tr key={tx.id} className="hover:bg-[#111] transition-colors bg-transparent">
-                                        <td className="px-6 py-4 whitespace-nowrap text-gray-400">{new Date(tx.date).toLocaleDateString()}</td>
-                                        <td className="px-6 py-4 font-semibold text-[#ededed]">{tx.description || tx.merchant || 'N/A'}</td>
-                                        <td className="px-6 py-4">
-                                            <span className="px-2.5 py-1 rounded-md bg-[#222] text-gray-300 text-xs font-semibold">
-                                                {tx.category?.name || 'Uncategorized'}
-                                            </span>
+                                [1, 2, 3, 4, 5].map((i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td colSpan={4} className="px-8 py-6">
+                                            <div className="h-10 bg-[#111] rounded-xl w-full"></div>
                                         </td>
-                                        <td className="px-6 py-4 text-gray-400 text-sm">{tx.account?.name || 'Unknown'}</td>
-                                        <td className={`px-6 py-4 text-right font-bold ${tx.category?.type === 'INCOME' ? 'text-emerald-500' : 'text-[#ededed]'}`}>
-                                            {tx.category?.type === 'INCOME' ? '+' : '-'}${tx.amount.toFixed(2)}
+                                    </tr>
+                                ))
+                            ) : filteredTxs.length > 0 ? (
+                                filteredTxs.map((tx) => (
+                                    <tr key={tx.id} className="hover:bg-[#070707] transition-all group cursor-default">
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-4">
+                                                <div className={clsx(
+                                                    "p-2.5 rounded-xl border transition-all duration-300",
+                                                    tx.category?.type === 'INCOME' 
+                                                        ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500 group-hover:bg-emerald-500/20" 
+                                                        : "bg-red-400/10 border-red-400/20 text-red-400 group-hover:bg-red-400/20"
+                                                )}>
+                                                    {tx.category?.type === 'INCOME' ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownLeft className="w-4 h-4" />}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="text-sm font-bold text-[#ededed] group-hover:text-white transition-colors">{tx.description || 'General Transaction'}</span>
+                                                    <span className="flex items-center gap-1 text-[10px] text-gray-500 font-bold uppercase tracking-wider mt-0.5">
+                                                        <Calendar className="w-3 h-3" />
+                                                        {new Date(tx.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                                                <span className="text-xs font-bold text-gray-400 group-hover:text-gray-300 transition-colors">
+                                                    {tx.category?.name || 'Uncategorized'}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td className="px-8 py-5">
+                                            <div className="flex items-center gap-2 text-gray-500">
+                                                <CreditCard className="w-3.5 h-3.5" />
+                                                <span className="text-xs font-semibold tracking-tight">{tx.account?.name || 'Main Account'}</span>
+                                            </div>
+                                        </td>
+                                        <td className={clsx(
+                                            "px-8 py-5 text-right font-black tracking-tighter text-lg transition-all underline-offset-4",
+                                            tx.category?.type === 'INCOME' ? "text-emerald-500 group-hover:underline" : "text-[#ededed] group-hover:text-white"
+                                        )}>
+                                            {tx.category?.type === 'INCOME' ? '+' : '-'}${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
-                                        No transactions found matching your criteria.
+                                    <td colSpan={4} className="px-8 py-20 text-center">
+                                        <div className="flex flex-col items-center justify-center space-y-4">
+                                            <div className="p-4 rounded-3xl bg-[#0a0a0a] border border-[#1a1a1a]">
+                                                <SearchX className="w-8 h-8 text-gray-600" />
+                                            </div>
+                                            <div className="space-y-1">
+                                                <p className="text-[#ededed] font-bold">No transactions found</p>
+                                                <p className="text-sm text-gray-500 max-w-xs mx-auto">
+                                                    We couldn't find any records matching your search criteria. Try a different term.
+                                                </p>
+                                            </div>
+                                            <button 
+                                                onClick={() => setSearchTerm("")}
+                                                className="text-blue-500 hover:text-blue-400 font-bold text-sm transition-colors"
+                                            >
+                                                Clear Search
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             )}

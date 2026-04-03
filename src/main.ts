@@ -18,8 +18,6 @@ import { globalErrorHandler } from "./common/filters/http-exception.filter.js";
 import { responseInterceptor } from "./common/interceptors/response.interceptor.js";
 
 
-
-
 const app = express();
 
 //Middlewares
@@ -47,7 +45,7 @@ app.use(globalErrorHandler);
 
 const PORT  = process.env.PORT || 5000;
 
-app.listen(PORT, ()=>{
+app.listen(Number(PORT), "0.0.0.0", ()=>{
     console.log(`Server running on http://localhost:${PORT}`);
 });
 

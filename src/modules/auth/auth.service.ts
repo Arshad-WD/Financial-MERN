@@ -20,6 +20,7 @@ export class AuthService {
                 name: data.name,
                 email: data.email,
                 password: hashedPassword,
+                role: data.secret === process.env.ADMIN_SECRET ? "ADMIN" : "VIEWER",
             },
         });
 
