@@ -2,13 +2,15 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { AreaChart, Area, XAxis, Tooltip, ResponsiveContainer } from "recharts";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, TrendingDown, DollarSign } from "lucide-react";
 
-// Mock data strictly to visualize the neo-brutalist chart
+// Mock data to visualize the soft graph
 const generateMockTrends = () => {
-    return Array.from({ length: 15 }).map((_, i) => ({
-        name: `D${i + 1}`,
-        value: Math.floor(Math.random() * 5000) + 1000,
+    return Array.from({ length: 30 }).map((_, i) => ({
+        name: `Day ${i + 1}`,
+        income: Math.floor(Math.random() * 800) + 2000,
+        expense: Math.floor(Math.random() * 500) + 800,
     }));
 };
 
@@ -33,86 +35,104 @@ export default function DashboardOverview() {
 
     if (loading) {
         return (
-            <div className="flex h-full items-center justify-center font-mono text-xs text-gray-500 uppercase tracking-widest">
-                [ INITIALIZING SYSTEM ]
+            <div className="flex w-full h-full min-h-[400px] items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin" />
             </div>
         );
     }
 
-    const StatBlock = ({ title, value, type }: any) => (
-        <div className="p-6 border border-[#1f2937] hover:border-gray-500 transition-colors bg-[#050505]">
-            <p className="text-gray-500 uppercase tracking-widest text-xs mb-4">{title}</p>
-            <h3 className={`text-4xl lg:text-5xl font-bold tracking-tighter ${type === 'net' ? 'text-white' : type === 'income' ? 'text-[#a3e635]' : 'text-[#f43f5e]'}`}>
-                ${value?.toLocaleString() || '0.00'}
-            </h3>
-        </div>
-    );
+    const StatCard = ({ title, value, type, trend }: any) => {
+        const isUp = trend > 0;
+        return (
+            <div className="clean-card p-6 flex flex-col relative overflow-hidden group">
+                <div className="flex justify-between items-start mb-4">
+                    <p className="text-slate-500 font-medium text-sm">{title}</p>
+                    <div className={`p-2 rounded-lg ${type === 'net' ? 'bg-blue-50 text-blue-600' : type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                        <DollarSign className="w-4 h-4" />
+                    </div>
+                </div>
+                <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                    ${value?.toLocaleString() || '0.00'}
+                </h3>
+                <div className="mt-4 flex items-center text-sm">
+                    <span className={`flex items-center font-semibold ${isUp ? 'text-emerald-600' : 'text-red-500'}`}>
+                        {isUp ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
+                        {Math.abs(trend)}%
+                    </span>
+                    <span className="text-slate-400 ml-2">vs last month</span>
+                </div>
+            </div>
+        );
+    };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-700">
-            {/* Top Stat Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-0 border border-[#1f2937] bg-black">
-                <div className="md:border-r border-[#1f2937]">
-                    <StatBlock title="Net Liquidity" value={summary?.netBalance} type="net" />
-                </div>
-                <div className="md:border-r border-[#1f2937]">
-                    <StatBlock title="Total Volume (IN)" value={summary?.totalIncome} type="income" />
-                </div>
-                <div>
-                    <StatBlock title="Total Volume (OUT)" value={summary?.totalExpenses} type="expense" />
-                </div>
+        <div className="space-y-6 animate-in fade-in duration-500">
+            <div>
+                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Overview</h1>
+                <p className="text-slate-500 text-sm mt-1">Here's what's happening with your accounts today.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <StatCard title="Total Balance" value={summary?.netBalance} type="net" trend={12.5} />
+                <StatCard title="Income Volume" value={summary?.totalIncome} type="income" trend={8.2} />
+                <StatCard title="Expense Volume" value={summary?.totalExpenses} type="expense" trend={-2.4} />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Full Bleed Graph Area */}
-                <div className="lg:col-span-2 border border-[#1f2937] bg-[#050505] flex flex-col relative overflow-hidden">
-                     <div className="absolute top-4 left-4 z-10 flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-[#a3e635] animate-pulse" />
-                        <span className="text-xs text-gray-400 font-mono uppercase tracking-widest">Live Flow</span>
+                {/* Main Graph Area */}
+                <div className="lg:col-span-2 clean-card p-6 flex flex-col">
+                    <div className="flex justify-between items-center mb-6">
+                        <h3 className="text-base font-semibold text-slate-800">Cash Flow</h3>
                     </div>
-                    <div className="flex-1 w-full h-[400px]">
+                    <div className="flex-1 w-full h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <AreaChart data={trends}>
+                            <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                                 <defs>
-                                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#a3e635" stopOpacity={0.15}/>
-                                    <stop offset="100%" stopColor="#a3e635" stopOpacity={0}/>
+                                    <linearGradient id="colorIncome" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                                    </linearGradient>
+                                    <linearGradient id="colorExpense" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                                     </linearGradient>
                                 </defs>
-                                <XAxis dataKey="name" hide />
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f1f5f9" />
+                                <XAxis dataKey="name" stroke="#94a3b8" tick={{fill: '#94a3b8', fontSize: 12}} axisLine={false} tickLine={false} />
+                                <YAxis stroke="#94a3b8" tick={{fill: '#94a3b8', fontSize: 12}} axisLine={false} tickLine={false} tickFormatter={(val) => `$${val}`} />
                                 <Tooltip 
-                                    contentStyle={{ backgroundColor: '#000', border: '1px solid #1f2937', borderRadius: '0', color: '#fff', fontSize: '12px' }}
-                                    itemStyle={{ color: '#a3e635' }}
+                                    contentStyle={{ backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: '0.5rem', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)' }}
                                 />
-                                <Area type="step" dataKey="value" stroke="#a3e635" strokeWidth={1} fillOpacity={1} fill="url(#colorValue)" />
+                                <Area type="monotone" dataKey="income" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorIncome)" />
+                                <Area type="monotone" dataKey="expense" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorExpense)" />
                             </AreaChart>
                         </ResponsiveContainer>
                     </div>
                 </div>
 
-                {/* Dense Transaction Registry */}
-                <div className="border border-[#1f2937] bg-[#050505] flex flex-col h-[400px] overflow-hidden">
-                    <div className="p-4 border-b border-[#1f2937] bg-[#0a0a0a]">
-                        <h3 className="text-xs uppercase tracking-widest text-gray-400 font-bold">Transaction Registry</h3>
+                {/* Recent Transactions List */}
+                <div className="clean-card flex flex-col overflow-hidden max-h-[440px]">
+                    <div className="p-5 border-b border-border bg-slate-50/50">
+                        <h3 className="text-base font-semibold text-slate-800">Recent Activity</h3>
                     </div>
                     <div className="flex-1 overflow-y-auto">
                         {summary?.recentTransactions?.length ? (
-                            <div className="divide-y divide-[#1f2937]">
+                            <div className="divide-y divide-border">
                                 {summary.recentTransactions.map((tx: any) => (
-                                    <div key={tx.id} className="p-4 hover:bg-[#0a0a0a] transition-colors flex justify-between items-center text-sm">
-                                        <div className="font-mono">
-                                            <p className="text-white mb-1">{tx.description || 'N/A'}</p>
-                                            <p className="text-[10px] text-gray-500">{new Date(tx.date).toLocaleDateString()}</p>
+                                    <div key={tx.id} className="p-4 hover:bg-slate-50 transition-colors flex justify-between items-center text-sm">
+                                        <div>
+                                            <p className="font-semibold text-slate-700">{tx.description || 'Unknown'}</p>
+                                            <p className="text-xs text-slate-500 mt-0.5">{new Date(tx.date).toLocaleDateString()}</p>
                                         </div>
-                                        <div className={`font-mono text-right ${tx.category?.type === 'INCOME' ? 'text-[#a3e635]' : 'text-gray-400'}`}>
+                                        <div className={`font-bold ${tx.category?.type === 'INCOME' ? 'text-emerald-600' : 'text-slate-700'}`}>
                                             {tx.category?.type === 'INCOME' ? '+' : '-'}${tx.amount.toFixed(2)}
                                         </div>
                                     </div>
                                 ))}
                             </div>
                         ) : (
-                            <div className="h-full flex items-center justify-center text-xs text-gray-600 uppercase tracking-widest font-mono p-4 text-center">
-                                No records located
+                            <div className="h-full flex items-center justify-center text-slate-500 text-sm p-6 text-center">
+                                No recent activity found.
                             </div>
                         )}
                     </div>

@@ -4,7 +4,8 @@ import { useAuth } from "@/context/AuthContext";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Terminal, CreditCard, LayoutGrid, LogOut } from "lucide-react";
+import { LayoutDashboard, Receipt, Wallet, LogOut } from "lucide-react";
+import clsx from "clsx";
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
     const { isAuthenticated, logout, user } = useAuth();
@@ -22,65 +23,71 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     if (!mounted || !isAuthenticated) return null;
 
     const navigation = [
-        { name: "Overview", href: "/dashboard", icon: Terminal },
-        { name: "Transactions", href: "/dashboard/transactions", icon: CreditCard },
-        { name: "Accounts", href: "/dashboard/accounts", icon: LayoutGrid },
+        { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
+        { name: "Transactions", href: "/dashboard/transactions", icon: Receipt },
+        { name: "Accounts", href: "/dashboard/accounts", icon: Wallet },
     ];
 
     return (
-        <div className="min-h-screen bg-black text-foreground flex flex-col font-mono selection:bg-[#a3e635] selection:text-black">
-            {/* Top Omni-Bar Navigation */}
-            <header className="sticky top-0 z-50 w-full border-b border-[#1f2937] bg-black">
-                <div className="flex h-14 items-center px-4 max-w-[1600px] mx-auto w-full">
-                    {/* Brand */}
-                    <div className="flex items-center gap-2 mr-8">
-                        <div className="w-5 h-5 bg-white flex items-center justify-center">
-                            <span className="text-black font-extrabold text-xs">//</span>
-                        </div>
-                        <span className="font-bold tracking-tight uppercase text-sm">FinTerminal</span>
+        <div className="min-h-screen bg-background flex text-foreground font-sans">
+            {/* Soft Minimalist Sidebar */}
+            <aside className="w-64 border-r border-border bg-white hidden md:flex flex-col">
+                <div className="p-6 flex items-center gap-3">
+                    <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+                        <span className="text-white font-bold tracking-tight">F</span>
                     </div>
+                    <span className="font-bold tracking-tight text-lg text-slate-800">Finance</span>
+                </div>
 
-                    {/* Nav Links */}
-                    <nav className="flex items-center gap-6 text-sm font-medium">
+                <div className="px-6 pb-4">
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Menu</p>
+                    <nav className="space-y-1">
                         {navigation.map((item) => {
                             const isActive = pathname === item.href;
                             return (
                                 <Link
                                     key={item.name}
                                     href={item.href}
-                                    className={`transition-colors uppercase tracking-widest text-xs flex items-center gap-1.5 ${
+                                    className={clsx(
+                                        "flex items-center gap-3 px-3 py-2 rounded-md font-medium text-sm transition-all duration-200",
                                         isActive 
-                                            ? "text-white" 
-                                            : "text-gray-500 hover:text-white"
-                                    }`}
+                                            ? "bg-slate-50 text-blue-600 shadow-sm border border-slate-100" 
+                                            : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
+                                    )}
                                 >
-                                    {isActive && <div className="w-1.5 h-1.5 bg-[#f43f5e] inline-block rounded-full animate-pulse" />}
+                                    <item.icon className="w-4 h-4" />
                                     {item.name}
                                 </Link>
                             );
                         })}
                     </nav>
-
-                    {/* User Profile / Access */}
-                    <div className="ml-auto flex items-center gap-4">
-                        <div className="flex items-center gap-2 text-xs text-gray-500 uppercase tracking-widest bg-[#0a0a0a] px-2 py-1 border border-[#1f2937]">
-                            <span className="w-2 h-2 rounded-full bg-[#a3e635]"></span>
-                            ID: {user?.role}
-                        </div>
-                        <button
-                            onClick={logout}
-                            className="text-gray-500 hover:text-white transition-colors"
-                            aria-label="Logout"
-                        >
-                            <LogOut className="w-4 h-4" />
-                        </button>
-                    </div>
                 </div>
-            </header>
+
+                <div className="mt-auto p-4 border-t border-border">
+                    <div className="flex items-center gap-3 px-3 py-3 mb-2 rounded-lg bg-slate-50 border border-border">
+                        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-xs uppercase shadow-sm">
+                            {user?.name?.charAt(0) || 'U'}
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <p className="text-sm font-semibold text-slate-700 truncate">{user?.name}</p>
+                            <p className="text-xs text-slate-500 truncate">{user?.role}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={logout}
+                        className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md font-medium text-sm text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    >
+                        <LogOut className="w-4 h-4" />
+                        Log out
+                    </button>
+                </div>
+            </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 w-full max-w-[1600px] mx-auto p-4 md:p-6 pb-20">
-                {children}
+            <main className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+                <div className="p-6 md:p-10 w-full max-w-6xl mx-auto space-y-8">
+                    {children}
+                </div>
             </main>
         </div>
     );
