@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpRight, ArrowDownLeft, Activity } from "lucide-react";
+import { TrendingUp, TrendingDown, DollarSign, Wallet, ArrowUpRight, ArrowDownLeft, Activity, Download } from "lucide-react";
+import { downloadCSV } from "@/lib/export";
 
 // Mock data to visualize the soft graph
 const generateMockTrends = () => {
@@ -93,9 +94,23 @@ export default function DashboardOverview() {
                             You've managed <span className="text-[#ededed] font-semibold">${summary?.totalIncome?.toLocaleString() || '0'}</span> in total income. Here's a pulse check of your current cash flow.
                         </p>
                     </div>
-                    <button className="bg-white hover:bg-gray-100 text-black px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95">
-                        Refresh Report
-                    </button>
+                    <div className="flex gap-3">
+                        <button 
+                            onClick={() => downloadCSV(summary?.recentTransactions?.map((tx: any) => ({
+                                Date: new Date(tx.date).toLocaleDateString(),
+                                Description: tx.description,
+                                Category: tx.category?.name,
+                                Amount: tx.amount
+                            })), 'Dashboard_Summary')}
+                            className="bg-[#111] hover:bg-[#1a1a1a] text-gray-300 border border-[#222] px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 active:scale-95 group"
+                        >
+                            <Download className="w-4 h-4 text-gray-500 group-hover:text-blue-400 transition-colors" />
+                            Export Data
+                        </button>
+                        <button className="bg-white hover:bg-gray-100 text-black px-6 py-3 rounded-xl font-bold text-sm transition-all shadow-[0_0_20px_rgba(255,255,255,0.1)] active:scale-95">
+                            Refresh Report
+                        </button>
+                    </div>
                 </div>
             </div>
 

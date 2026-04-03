@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import api from '@/lib/axios';
-import { Plus, Wallet, CreditCard, Landmark, PiggyBank, Briefcase } from 'lucide-react';
+import { Plus, Wallet, CreditCard, Landmark, PiggyBank, Briefcase, Download } from 'lucide-react';
+import { downloadCSV } from '@/lib/export';
 
 interface Account {
     id: string;
@@ -61,10 +62,23 @@ export default function AccountsPage() {
                     <h1 className="text-2xl font-bold tracking-tight text-[#ededed]">Accounts</h1>
                     <p className="text-sm text-gray-400">Manage your connected bank accounts and credit cards.</p>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-                    <Plus className="w-4 h-4" />
-                    Add Account
-                </button>
+                <div className="flex gap-3">
+                    <button 
+                        onClick={() => downloadCSV(accounts.map(acc => ({
+                            Name: acc.name,
+                            Type: acc.type,
+                            Balance: acc.balance
+                        })), 'Accounts')}
+                        className="bg-[#111] hover:bg-[#1a1a1a] text-gray-300 border border-[#222] px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 active:scale-95 group"
+                    >
+                        <Download className="w-4 h-4 text-gray-500 group-hover:text-blue-400 transition-colors" />
+                        Export
+                    </button>
+                    <button className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.3)] group">
+                        <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+                        Add Account
+                    </button>
+                </div>
             </div>
 
             {error && (

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import api from "@/lib/axios";
-import { Plus, Search, Filter, ArrowUpRight, ArrowDownLeft, Calendar, Tag, CreditCard, SearchX } from "lucide-react";
+import { Plus, Search, Filter, ArrowUpRight, ArrowDownLeft, Calendar, Tag, CreditCard, SearchX, Download } from "lucide-react";
+import { downloadCSV } from "@/lib/export";
 import clsx from "clsx";
 
 export default function TransactionsPage() {
@@ -41,10 +42,26 @@ export default function TransactionsPage() {
                         A complete ledger of your financial history across all connected accounts.
                     </p>
                 </div>
-                <button className="bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.15)] active:scale-95 group">
-                    <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
-                    Record Transaction
-                </button>
+                <div className="flex gap-3 w-full md:w-auto">
+                    <button 
+                        onClick={() => downloadCSV(filteredTxs.map(tx => ({
+                            Date: new Date(tx.date).toLocaleDateString(),
+                            Description: tx.description,
+                            Category: tx.category?.name,
+                            Type: tx.category?.type,
+                            Account: tx.account?.name,
+                            Amount: tx.amount
+                        })), 'Transactions')}
+                        className="flex-1 md:flex-none bg-[#111] hover:bg-[#1a1a1a] text-gray-300 border border-[#222] px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 active:scale-95 group"
+                    >
+                        <Download className="w-4 h-4 text-gray-500 group-hover:text-blue-400 transition-colors" />
+                        Export CSV
+                    </button>
+                    <button className="flex-1 md:flex-none bg-blue-600 hover:bg-blue-500 text-white px-6 py-3 rounded-xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(59,130,246,0.15)] active:scale-95 group">
+                        <Plus className="w-4 h-4 transition-transform group-hover:rotate-90" />
+                        Record Transaction
+                    </button>
+                </div>
             </div>
 
             {/* Filter Bar */}
