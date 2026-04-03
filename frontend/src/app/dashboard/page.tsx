@@ -44,17 +44,20 @@ export default function DashboardOverview() {
     const StatCard = ({ title, value, type, trend }: any) => {
         const isUp = trend > 0;
         return (
-            <div className="clean-card p-6 flex flex-col relative overflow-hidden group">
-                <div className="flex justify-between items-start mb-4">
+            <div className="clean-card p-6 flex flex-col relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 hover:shadow-lg cursor-default">
+                {/* Subtle gradient background on hover */}
+                <div className="absolute inset-0 bg-gradient-to-br from-transparent to-slate-50/50 opacity-0 group-hover:opacity-100 transition-opacity" />
+                
+                <div className="flex justify-between items-start mb-4 relative z-10">
                     <p className="text-slate-500 font-medium text-sm">{title}</p>
-                    <div className={`p-2 rounded-lg ${type === 'net' ? 'bg-blue-50 text-blue-600' : type === 'income' ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'}`}>
+                    <div className={`p-2 rounded-lg transition-colors ${type === 'net' ? 'bg-blue-50 group-hover:bg-blue-100 text-blue-600' : type === 'income' ? 'bg-emerald-50 group-hover:bg-emerald-100 text-emerald-600' : 'bg-red-50 group-hover:bg-red-100 text-red-600'}`}>
                         <DollarSign className="w-4 h-4" />
                     </div>
                 </div>
-                <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">
+                <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight relative z-10">
                     ${value?.toLocaleString() || '0.00'}
                 </h3>
-                <div className="mt-4 flex items-center text-sm">
+                <div className="mt-4 flex items-center text-sm relative z-10">
                     <span className={`flex items-center font-semibold ${isUp ? 'text-emerald-600' : 'text-red-500'}`}>
                         {isUp ? <TrendingUp className="w-4 h-4 mr-1" /> : <TrendingDown className="w-4 h-4 mr-1" />}
                         {Math.abs(trend)}%
@@ -66,10 +69,20 @@ export default function DashboardOverview() {
     };
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-2xl font-bold tracking-tight text-slate-900">Overview</h1>
-                <p className="text-slate-500 text-sm mt-1">Here's what's happening with your accounts today.</p>
+        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 ease-out">
+            <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-2xl p-8 text-white shadow-xl shadow-blue-900/10 relative overflow-hidden">
+                {/* Decorative background geometry */}
+                <div className="absolute top-0 right-0 -mt-16 -mr-16 w-64 h-64 bg-white opacity-5 rounded-full blur-3xl"></div>
+                <div className="absolute bottom-0 left-0 -mb-16 -ml-16 w-48 h-48 bg-white opacity-10 rounded-full blur-2xl"></div>
+                
+                <div className="relative z-10">
+                    <h1 className="text-3xl font-bold tracking-tight mb-2">
+                        Good morning — your finances are looking solid!
+                    </h1>
+                    <p className="text-blue-100 max-w-xl">
+                        You have received ${summary?.totalIncome?.toLocaleString() || '0'} in income over the trackable period. Check your detailed cash flow below.
+                    </p>
+                </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
